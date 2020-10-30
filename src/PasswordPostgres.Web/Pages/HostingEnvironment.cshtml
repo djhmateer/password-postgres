@@ -1,0 +1,15 @@
+﻿@page
+@model HostingEnvironmentModel
+@{
+    ViewData["Title"] = "Hosting Environment";
+}
+<h1>@ViewData["Title"]</h1>
+
+<h2>@Model.EnvironmentString</h2>
+
+<p>This reads the ASPNETCORE_ENVIRONMENT flag from the system</p>
+
+<p>set on production server via the dot net run command</p>
+<p>set on development via the launchSettings.json file</p>
+<p>set on Unit test projects via the TestBase</p>
+

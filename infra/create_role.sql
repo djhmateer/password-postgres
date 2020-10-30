@@ -1,0 +1,7 @@
+-- dev
+-- CREATE ROLE alice SUPERUSER LOGIN PASSWORD 'letmein2';
+
+-- prod
+CREATE ROLE bob SUPERUSER LOGIN PASSWORD 'letmein3';
+
+

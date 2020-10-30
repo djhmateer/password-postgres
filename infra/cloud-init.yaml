@@ -1,0 +1,137 @@
+#cloud-config
+
+# cloud-init.yaml - this file. (edit this one)
+# /secrets/cloud-init-with-secrets.yaml - this file with {{template}} substituted
+
+# /var/log/cloud-init-output.log - cloud init logs (this script)
+
+# kestrel (.NET Serilog) logs in /var/www/web/logs/ - application logs
+# nginx /var/log/nginx/ error.log and access.log - full http logs
+
+
+# nginx conf in /usr/local/openresty/nginx/conf
+# to restart openresty after a conf update: sudo systemctl restart openresty
+
+# ~/testout.txt for the dotnet test output
+
+# **need to look into templating or variable substitution options**
+# In the meantime look for ***** in this script
+# name=PasswordPostgres
+
+package_upgrade: true
+runcmd:
+  # install dotnet
+  - wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+  - sudo dpkg -i packages-microsoft-prod.deb
+  - sudo add-apt-repository universe -y
+  - sudo apt-get update -y
+  - sudo apt-get install apt-transport-https -y
+  - sudo apt-get update -y
+
+  # need the sdk as we'll be compiling
+  - sudo apt-get install dotnet-sdk-3.1 -y
+
+  # nginx
+  - sudo apt-get install nginx -y
+
+  # a nice shortcut sym link
+  # - sudo ln -s /var/www/ /home/dave/www
+
+  # a nice restart command for nginx
+  - cd /home/dave
+  - echo "sudo systemctl restart nginx" > s.sh
+  - sudo chmod 777 s.sh
+
+  # clone source
+  - cd /home/dave
+  # *************
+  - sudo git clone https://github.com/djhmateer/password-postgres.git source
+  # *************
+
+  # run the tests on the server as a last ditch safety net (make sure tests run linux side)
+  # should we create a testdb and connection first for this?
+  # - cd /home/dave/source/src/PasswordPostgres.Web.IntegrationTests
+  # - sudo dotnet test -v n > /home/dave/integrationtestsout.txt
+
+  # - cd /home/dave/source/src/PasswordPostgres.Web.UnitTests
+  # - sudo dotnet test -v n > /home/dave/unittestsout.txt
+
+  # publish the web app
+  # *************
+  - cd /home/dave/source/src/PasswordPostgres.Web
+  - sudo dotnet publish --configuration Release 
+
+  # copy files to www directory
+  # ***********
+  - cd /home/dave/source/src/PasswordPostgres.Web/bin/Release/netcoreapp3.1/publish/
+  - sudo mkdir /var/www/web
+  - sudo cp -a * /var/www/web/.
+
+  # change ownership of the files - TODO review this
+  - sudo chown -R www-data:www-data /var/www/web
+
+  # nginx config
+  - sudo cp /home/dave/source/infra/nginx.conf /etc/nginx/sites-available/default
+  - sudo nginx -s reload
+
+  # get rid of the default nginx files
+  - sudo rm -rf /var/www/html
+
+  # make the systemd service to keep Kestrel alive
+  # ****** change name of DLL inside here
+  - sudo cp /home/dave/source/infra/kestrel.service /etc/systemd/system/kestrel.service
+  - sudo systemctl enable kestrel.service
+  - sudo systemctl start kestrel.service
+
+  #
+  # Bashtop
+  #
+  - echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
+  - sudo wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+  - sudo apt update -y
+  - sudo apt install bashtop -y
+
+  # Postgres
+  - sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  - sudo apt-get update
+  - sudo apt-get -y install postgresql
+
+  - sudo systemctl start postgresql@12-main
+
+  # configure postgres
+  # - sudo -u postgres psql -c "CREATE ROLE bob SUPERUSER LOGIN PASSWORD 'letmein3';"
+
+  # create Db, Role of Bob for app to conect to 
+  # -a is to print all the output inclding data to stdout (useful for debugging)
+  - cd /home/dave/source/infra
+  - sudo -u postgres psql -a -f create_db.sql
+  - sudo -u postgres psql -a -f create_role.sql
+
+  # insert seed data
+  # ****change name of db****
+  - sudo -u postgres psql -d passwordpostgres -a -f create_tables.sql
+  - sudo -u postgres psql -d passwordpostgres -a -f insert_data.sql
+  - sudo -u postgres psql -d passwordpostgres -a -f import_data.sql
+
+# make a quick test page to signify that the server is ready to go
+  # - cd /var/www/cookie-dave-web
+  # - echo "Healthy" > healthcheck.html
+
+# OS updates need a reboot 
+#  - sudo reboot now
+
+  # will use bash templating to insert this secret in
+  - echo "Creating secrets directory with api keys in"
+  - sudo mkdir /var/www/web/secrets
+  - cd /var/www/web
+  # todo work on these as was getting strange problems
+  - chmod -R 777 secrets
+  - cd secrets
+  # this is replaced when infra.azcli is run
+  - echo "{{SENDGRID_API_KEY}}" > sendgrid-passwordpostgres.txt
+  - cd ..
+  # so that .NET process can read the file.. todo make less open
+  - sudo chmod -R 777 secrets
+
+final_message: "The system is finally up, after $UPTIME seconds"
