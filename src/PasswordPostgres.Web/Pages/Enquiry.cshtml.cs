@@ -78,14 +78,13 @@ namespace PasswordPostgres.Web.Pages
                 From = new EmailAddress("test@example.com", "DX Team"),
                 Subject = $"PasswordPostgres time sent is {time}",
                 PlainTextContent = "Hello, Email!",
-                HtmlContent = "<strong>Hello, Email!</strong>"
+                //HtmlContent = "<strong>Hello, Email!</strong>"
             };
-            //msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
-            msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
+            msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
+            //msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
             var response = await client.SendEmailAsync(msg);
 
             //_emailService.SendAsync(Email, "admin@example.com", Subject, Message);
-            Log.Information($"response is {response}");
 
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
