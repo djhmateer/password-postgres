@@ -85,10 +85,12 @@ namespace PasswordPostgres.Web.Pages
             var response = await client.SendEmailAsync(msg);
 
             //_emailService.SendAsync(Email, "admin@example.com", Subject, Message);
+            Log.Information($"response is {response}");
 
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
                 // have retry logic
+                Log.Information($"response is {response.Headers}");
                 ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
                 return Page();
             }
