@@ -1,12 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using PasswordPostgres.Web;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using Serilog;
