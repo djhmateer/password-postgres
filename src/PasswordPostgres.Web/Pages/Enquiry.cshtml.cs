@@ -82,9 +82,9 @@ namespace PasswordPostgres.Web.Pages
             };
             msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
             //msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
-            var response = await client.SendEmailAsync(msg);
 
-            //_emailService.SendAsync(Email, "admin@example.com", Subject, Message);
+            msg.AddContent(MimeType.Text, "Hello World plain text!");
+            var response = await client.SendEmailAsync(msg);
 
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
