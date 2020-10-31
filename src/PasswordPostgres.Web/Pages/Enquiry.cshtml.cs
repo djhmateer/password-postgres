@@ -41,30 +41,18 @@ namespace PasswordPostgres.Web.Pages
         public async Task<IActionResult> OnPostAsync()
         {
             //if (!ModelState.IsValid) return Page();
-            //var apiKey = System.Environment.GetEnvironmentVariable("SENDGRID_APIKEY");
-            //var sendgrid_api_key = System.IO.File.ReadAllText("sendgrid-passwordpostgres.txt");
 
-            // Windows: C:\dev\test\password-postgres\src\PasswordPostgres.Web
-            // Linux: /var/www/web
             var filepath = Directory.GetCurrentDirectory();
             Log.Information($"filepath from Directory.GetCurrentDirectory() is {filepath}");
-
-            // windows: C:\dev\test\password-postgres\src\PasswordPostgres.Web\bin\Debug\netcoreapp3.1
-            // linux: /var/www/web
-            //var asdf = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            //Log.Information($"reflection filepath is {asdf}");
 
             string apiKey;
             if (filepath == "/var/www/web")
             {
-                // Linux in Prod
                 Log.Information("Linux looking for apikey for sendgrid");
-                // I'm sure this worked from 4790!
                 apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
             }
             else
             {
-                // this works on Windows in Dev
                 Log.Information("Windows looking for apikey for sendgrid");
                 apiKey = await System.IO.File.ReadAllTextAsync("../../secrets/sendgrid-passwordpostgres.txt");
             }
