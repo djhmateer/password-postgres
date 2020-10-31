@@ -47,12 +47,14 @@ namespace PasswordPostgres.Web.Pages
             Log.Information($"filepath from Directory.GetCurrentDirectory() is {filepath}");
 
             string apiKey;
+            bool isLinux = false;
             if (filepath == "/var/www/web")
             {
                 Log.Information("Linux looking for apikey for sendgrid");
                 // https://stackoverflow.com/a/15259355/26086
                 var thing = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
                 apiKey = new string(thing.Where(c => !char.IsControl(c)).ToArray());
+                isLinux = true;
             }
             else
             {
@@ -67,12 +69,12 @@ namespace PasswordPostgres.Web.Pages
             var msg = new SendGridMessage
             {
                 From = new EmailAddress("test@example.com", "DX Team"),
-                Subject = $"PasswordPostgres time sent is {time}",
+                Subject = $"PasswordPostgres linux {isLinux} time sent is {time}",
                 PlainTextContent = "Hello, Email!",
-                //HtmlContent = "<strong>Hello, Email!</strong>"
+                HtmlContent = "<strong>Hello, Email!</strong>"
             };
-            msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
-            //msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
+            //msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
+            msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
 
             msg.AddContent(MimeType.Text, "Hello World plain text!");
             var response = await client.SendEmailAsync(msg);
