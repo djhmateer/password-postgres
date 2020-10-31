@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -16,7 +17,9 @@ namespace ConsoleApp1
             string apiKey;
             if (filepath == "/var/www/web")
             {
-                apiKey = await File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+                var thing = await File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+                // https://stackoverflow.com/a/15259355/26086
+                apiKey = new string(thing.Where(c => !char.IsControl(c)).ToArray());
             }
             else
             {
