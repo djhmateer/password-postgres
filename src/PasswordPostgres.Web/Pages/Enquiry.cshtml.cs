@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +50,9 @@ namespace PasswordPostgres.Web.Pages
             if (filepath == "/var/www/web")
             {
                 Log.Information("Linux looking for apikey for sendgrid");
-                apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+                // https://stackoverflow.com/a/15259355/26086
+                var thing = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+                apiKey = new string(thing.Where(c => !char.IsControl(c)).ToArray());
             }
             else
             {
