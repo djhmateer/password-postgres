@@ -54,16 +54,7 @@ namespace PasswordPostgres.Web.Pages
             {
                 Log.Information("Linux looking for apikey for sendgrid");
                 // https://stackoverflow.com/a/15259355/26086
-                var thing = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
-
-                for (int ctr = 0; ctr < thing.Length; ctr++)
-                {
-                    if (char.IsControl(thing, ctr))
-                        Log.Information("Control character \\U{0} found in position {1}.",
-                            Convert.ToInt32(thing[ctr]).ToString("X4"), ctr);
-                } 
-                
-                apiKey = new string(thing.Where(c => !char.IsControl(c)).ToArray());
+                apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
                 isLinux = true;
             }
             else
@@ -71,8 +62,6 @@ namespace PasswordPostgres.Web.Pages
                 Log.Information("Windows looking for apikey for sendgrid");
                 apiKey = await System.IO.File.ReadAllTextAsync("../../secrets/sendgrid-passwordpostgres.txt");
             }
-
-            Log.Information($"API key is {apiKey}");
 
             var client = new SendGridClient(apiKey);
             var time = DateTime.Now.ToString("HH:mm:ss");
@@ -91,8 +80,7 @@ namespace PasswordPostgres.Web.Pages
 
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
-                // have retry logic
-                Log.Information($"response is {response.Headers}");
+                // need retry logic
                 ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
                 return Page();
             }
