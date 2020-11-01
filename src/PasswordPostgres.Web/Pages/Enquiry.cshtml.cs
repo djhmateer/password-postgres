@@ -1,7 +1,9 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -53,6 +55,14 @@ namespace PasswordPostgres.Web.Pages
                 Log.Information("Linux looking for apikey for sendgrid");
                 // https://stackoverflow.com/a/15259355/26086
                 var thing = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+
+                for (int ctr = 0; ctr < thing.Length; ctr++)
+                {
+                    if (char.IsControl(thing, ctr))
+                        Log.Information("Control character \\U{0} found in position {1}.",
+                            Convert.ToInt32(thing[ctr]).ToString("X4"), ctr);
+                } 
+                
                 apiKey = new string(thing.Where(c => !char.IsControl(c)).ToArray());
                 isLinux = true;
             }
@@ -65,7 +75,7 @@ namespace PasswordPostgres.Web.Pages
             Log.Information($"API key is {apiKey}");
 
             var client = new SendGridClient(apiKey);
-            var time = System.DateTime.Now.ToString("HH:mm:ss");
+            var time = DateTime.Now.ToString("HH:mm:ss");
             var msg = new SendGridMessage
             {
                 From = new EmailAddress("test@example.com", "DX Team"),
