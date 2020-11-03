@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+//using SendGrid;
+//using SendGrid.Helpers.Mail;
 using Serilog;
+using PostmarkDotNet;
+using PostmarkDotNet.Model;
 
 namespace PasswordPostgres.Web.Pages
 {
@@ -38,54 +40,148 @@ namespace PasswordPostgres.Web.Pages
         public void OnGet()
         {
         }
-
-        // https://github.com/sendgrid/sendgrid-csharp#hello
-        // https://github.com/sendgrid/sendgrid-csharp/blob/main/USE_CASES.md
         public async Task<IActionResult> OnPostAsync()
         {
             //if (!ModelState.IsValid) return Page();
 
             var filepath = Directory.GetCurrentDirectory();
-            Log.Information($"filepath from Directory.GetCurrentDirectory() is {filepath}");
 
             string apiKey;
             bool isLinux = false;
             if (filepath == "/var/www/web")
             {
-                Log.Information("Linux looking for apikey for sendgrid");
-                // https://stackoverflow.com/a/15259355/26086
-                apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+                Log.Information("Linux looking for apikey for postmark");
+                apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/postmark-passwordpostgres.txt");
                 isLinux = true;
             }
             else
             {
-                Log.Information("Windows looking for apikey for sendgrid");
-                apiKey = await System.IO.File.ReadAllTextAsync("../../secrets/sendgrid-passwordpostgres.txt");
+                Log.Information("Windows looking for apikey for postmark");
+                apiKey = await System.IO.File.ReadAllTextAsync("../../secrets/postmark-passwordpostgres.txt");
             }
 
-            var client = new SendGridClient(apiKey);
             var time = DateTime.Now.ToString("HH:mm:ss");
-            var msg = new SendGridMessage
+
+            var message = new PostmarkMessage()
             {
-                From = new EmailAddress("test@example.com", "DX Team"),
-                Subject = $"PasswordPostgres linux {isLinux} time sent is {time}",
-                PlainTextContent = "Hello, Email!",
-                HtmlContent = "<strong>Hello, Email!</strong>"
+                To = "davemateer@mailinator.com",
+                From = "dave@hmsoftware.co.uk",
+                //TrackOpens = true,
+                Subject = $"A complex email {time}",
+                TextBody = "Plain Text Body - hello world",
+                //HtmlBody = "<html><body><img src=\"cid:embed_name.jpg\"/></body></html>",
+                HtmlBody = "<html><body><p>Hello world</p></body></html>",
+                //Tag = "business-message",
+                //Headers = new HeaderCollection{
+                //    {"X-CUSTOM-HEADER", "Header content"}
+                //}
             };
-            //msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
-            msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
 
-            msg.AddContent(MimeType.Text, "Hello World plain text!");
-            var response = await client.SendEmailAsync(msg);
+            //var imageContent = System.IO.File.ReadAllBytes("test.jpg");
+            //message.AddAttachment(imageContent, "test.jpg", "image/jpg", "cid:embed_name.jpg");
 
-            if (response.StatusCode != HttpStatusCode.Accepted)
+            var serverToken = apiKey;
+            var client = new PostmarkClient(serverToken);
+            try
             {
-                // need retry logic
-                ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
-                return Page();
+                var sendResult = await client.SendMessageAsync(message);
+
+                // If there's a problem with the content of your message,
+                // the API will still return, but with an error status code, 
+                // you should take appropriate steps to resolve/retry if this 
+                // happens.
+                if (sendResult.Status == PostmarkStatus.Success)
+                {
+                    /* Handle success */
+                    Log.Information("send success");
+                }
+                else
+                {
+                    Log.Warning($"send fail Postmark {sendResult.Status} {sendResult.Message}");
+                    //    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
+                    //    return Page();
+
+                }
+
             }
+            catch (Exception ex)
+            {
+                // Calls to the client can throw an exception 
+                // if the request to the API times out.
+                Log.Error($"Sending mail via Postmark error {ex.Message}");
+                //    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
+                //    return Page();
+
+            }
+            //var msg = new SendGridMessage
+            //{
+            //    From = new EmailAddress("test@example.com", "DX Team"),
+            //    Subject = $"PasswordPostgres linux {isLinux} time sent is {time}",
+            //    PlainTextContent = "Hello, Email!",
+            //    HtmlContent = "<strong>Hello, Email!</strong>"
+            //};
+            ////msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
+            //msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
+
+            //var response = await client.SendEmailAsync(msg);
+
+            //if (response.StatusCode != HttpStatusCode.Accepted)
+            //{
+            //    // need retry logic
+            //    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
+            //    return Page();
+            //}
 
             return RedirectToPage("EnquirySent");
         }
+
+
+        // https://github.com/sendgrid/sendgrid-csharp#hello
+        // https://github.com/sendgrid/sendgrid-csharp/blob/main/USE_CASES.md
+        //public async Task<IActionResult> OnPostAsyncSendGrid()
+        //{
+        //    //if (!ModelState.IsValid) return Page();
+
+        //    var filepath = Directory.GetCurrentDirectory();
+        //    Log.Information($"filepath from Directory.GetCurrentDirectory() is {filepath}");
+
+        //    string apiKey;
+        //    bool isLinux = false;
+        //    if (filepath == "/var/www/web")
+        //    {
+        //        Log.Information("Linux looking for apikey for sendgrid");
+        //        // https://stackoverflow.com/a/15259355/26086
+        //        apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/sendgrid-passwordpostgres.txt");
+        //        isLinux = true;
+        //    }
+        //    else
+        //    {
+        //        Log.Information("Windows looking for apikey for sendgrid");
+        //        apiKey = await System.IO.File.ReadAllTextAsync("../../secrets/sendgrid-passwordpostgres.txt");
+        //    }
+
+        //    var client = new SendGridClient(apiKey);
+        //    var time = DateTime.Now.ToString("HH:mm:ss");
+        //    var msg = new SendGridMessage
+        //    {
+        //        From = new EmailAddress("test@example.com", "DX Team"),
+        //        Subject = $"PasswordPostgres linux {isLinux} time sent is {time}",
+        //        PlainTextContent = "Hello, Email!",
+        //        HtmlContent = "<strong>Hello, Email!</strong>"
+        //    };
+        //    //msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
+        //    msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
+
+        //    var response = await client.SendEmailAsync(msg);
+
+        //    if (response.StatusCode != HttpStatusCode.Accepted)
+        //    {
+        //        // need retry logic
+        //        ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
+        //        return Page();
+        //    }
+
+        //    return RedirectToPage("EnquirySent");
+        //}
     }
 }
