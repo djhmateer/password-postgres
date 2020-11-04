@@ -64,9 +64,9 @@ namespace PasswordPostgres.Web.Pages
 
             var message = new PostmarkMessage()
             {
-                //To = "davemateer@mailinator.com",
+                To = "davemateer@mailinator.com",
                 //To = "pen@hmsoftware.co.uk",
-                To = "dave@hmsoftware.co.uk",
+                //To = "dave@hmsoftware.co.uk",
                 From = "dave@hmsoftware.co.uk",
                 //TrackOpens = true,
                 Subject = $"A complex email {time}",
