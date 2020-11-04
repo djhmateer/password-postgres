@@ -64,7 +64,9 @@ namespace PasswordPostgres.Web.Pages
 
             var message = new PostmarkMessage()
             {
-                To = "davemateer@mailinator.com",
+                //To = "davemateer@mailinator.com",
+                //To = "pen@hmsoftware.co.uk",
+                To = "dave@hmsoftware.co.uk",
                 From = "dave@hmsoftware.co.uk",
                 //TrackOpens = true,
                 Subject = $"A complex email {time}",
@@ -98,19 +100,17 @@ namespace PasswordPostgres.Web.Pages
                 else
                 {
                     Log.Warning($"send fail Postmark {sendResult.Status} {sendResult.Message}");
-                    //    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
-                    //    return Page();
-
+                    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {sendResult.Status} and message {sendResult.Message}");
+                    return Page();
                 }
-
             }
             catch (Exception ex)
             {
                 // Calls to the client can throw an exception 
                 // if the request to the API times out.
                 Log.Error($"Sending mail via Postmark error {ex.Message}");
-                //    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
-                //    return Page();
+                ModelState.AddModelError(string.Empty, $"Exception sending message - timeout? {ex.Message}");
+                return Page();
 
             }
             //var msg = new SendGridMessage

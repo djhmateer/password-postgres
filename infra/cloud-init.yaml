@@ -129,9 +129,8 @@ runcmd:
   - chmod -R 777 secrets
   - cd secrets
   # this is replaced when infra.azcli is run
-  # we don't want a linefeed at the end (echo does by default)
-  #- echo "{{SENDGRID_API_KEY}}" > sendgrid-passwordpostgres.txt
   - printf "{{SENDGRID_API_KEY}}" > sendgrid-passwordpostgres.txt
+  - printf "{{POSTMARK_SERVER_TOKEN}}" > postmark-passwordpostgres.txt
   - cd ..
   # so that .NET process can read the file.. todo make less open
   - sudo chmod -R 777 secrets

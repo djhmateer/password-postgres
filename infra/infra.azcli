@@ -43,24 +43,24 @@ cd infra
 ## which is stored in the projects secrets/ folder
 ## which isn't checked into public source control (kept on OneDrive)
 ## then make sure this new cloud-init-with-secrets.txt is in /secrets
-# If one of my keys exist 
-filename="../secrets/sendgrid-passwordpostgres.txt"
-if [ -f "$filename" ]; then
-  sendgridkey=$(cat "$filename")
 
-  echo "Found SendGrid key - patching it into cloud-init.yaml"
+## Assuming if sendgridfilename exists, then postmark will too
+sendgridfilename="../secrets/sendgrid-passwordpostgres.txt"
+postmarkfilename="../secrets/postmark-passwordpostgres.txt"
+if [ -f "$sendgridfilename" ]; then
+  sendgridkey=$(cat "$sendgridfilename")
+  postmarkkey=$(cat "$postmarkfilename")
 
   # this will overwrite without asking
   cp cloud-init.yaml ../secrets/cloud-init-with-secrets.yaml
 
   # replace
-#   sed -i -e 's/{{SENDGRID_API_KEY}}/XYZ/g' ../secrets/cloud-init-with-secrets.yaml
   sed -i -e "s/{{SENDGRID_API_KEY}}/$sendgridkey/g" ../secrets/cloud-init-with-secrets.yaml
+  sed -i -e "s/{{POSTMARK_SERVER_TOKEN}}/$postmarkkey/g" ../secrets/cloud-init-with-secrets.yaml
 
 else
   read -p "Sendgrid file not found, press any key to continue - do you really want to continue? (no infrastructure created yet)"
 fi
-
 
 # Create a resource group
 az group create \
