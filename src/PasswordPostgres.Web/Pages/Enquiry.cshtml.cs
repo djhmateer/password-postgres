@@ -22,18 +22,19 @@ namespace PasswordPostgres.Web.Pages
         public EnquiryModel(IEmailService emailService)
         {
             _emailService = emailService;
+            Message = "This is a test message"; // a default for testing
         }
 
-        //[Required]
+        [Required]
         [EmailAddress]
         [BindProperty]
         public string? Email { get; set; }
 
-        //[Required]
+        [Required]
         [BindProperty]
         public string? Subject { get; set; }
 
-        //[Required]
+        [Required]
         [BindProperty]
         public string? Message { get; set; }
 
@@ -42,17 +43,16 @@ namespace PasswordPostgres.Web.Pages
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            //if (!ModelState.IsValid) return Page();
+            // Javascript should catch any errors, but just in case
+            if (!ModelState.IsValid) return Page();
 
             var filepath = Directory.GetCurrentDirectory();
 
             string apiKey;
-            bool isLinux = false;
             if (filepath == "/var/www/web")
             {
                 Log.Information("Linux looking for apikey for postmark");
                 apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/postmark-passwordpostgres.txt");
-                isLinux = true;
             }
             else
             {
@@ -64,15 +64,18 @@ namespace PasswordPostgres.Web.Pages
 
             var message = new PostmarkMessage()
             {
-                To = "davemateer@mailinator.com",
+                To = Email,
+                //To = "davemateer@mailinator.com",
                 //To = "pen@hmsoftware.co.uk",
                 //To = "dave@hmsoftware.co.uk",
-                From = "dave@hmsoftware.co.uk",
+                From = "dave@hmsoftware.co.uk", // has to be a Sender Signature on postmark account
                 //TrackOpens = true,
-                Subject = $"A complex email {time}",
-                TextBody = "Plain Text Body - hello world",
+                Subject = Subject,
+                //Subject = $"A complex email {time}",
+                TextBody = Message,
+                //TextBody = "Plain Text Body - hello world",
                 //HtmlBody = "<html><body><img src=\"cid:embed_name.jpg\"/></body></html>",
-                HtmlBody = "<html><body><p>Hello world</p></body></html>",
+                //HtmlBody = "<html><body><p>Hello world</p></body></html>",
                 //Tag = "business-message",
                 //Headers = new HeaderCollection{
                 //    {"X-CUSTOM-HEADER", "Header content"}
@@ -88,51 +91,25 @@ namespace PasswordPostgres.Web.Pages
             {
                 var sendResult = await client.SendMessageAsync(message);
 
-                // If there's a problem with the content of your message,
-                // the API will still return, but with an error status code, 
-                // you should take appropriate steps to resolve/retry if this 
-                // happens.
                 if (sendResult.Status == PostmarkStatus.Success)
                 {
-                    /* Handle success */
                     Log.Information("send success");
+                    return RedirectToPage("EnquirySent");
                 }
-                else
-                {
-                    Log.Warning($"send fail Postmark {sendResult.Status} {sendResult.Message}");
-                    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {sendResult.Status} and message {sendResult.Message}");
-                    return Page();
-                }
+
+                Log.Warning($"send fail Postmark {sendResult.Status} {sendResult.Message}");
+                ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {sendResult.Status} and message {sendResult.Message}");
+                return Page();
             }
             catch (Exception ex)
             {
                 // Calls to the client can throw an exception 
                 // if the request to the API times out.
+                // or if the From address is not a Sender Signature 
                 Log.Error($"Sending mail via Postmark error {ex.Message}");
-                ModelState.AddModelError(string.Empty, $"Exception sending message - timeout? {ex.Message}");
+                ModelState.AddModelError(string.Empty, $"Exception sending message {ex.Message}");
                 return Page();
-
             }
-            //var msg = new SendGridMessage
-            //{
-            //    From = new EmailAddress("test@example.com", "DX Team"),
-            //    Subject = $"PasswordPostgres linux {isLinux} time sent is {time}",
-            //    PlainTextContent = "Hello, Email!",
-            //    HtmlContent = "<strong>Hello, Email!</strong>"
-            //};
-            ////msg.AddTo(new EmailAddress("davemateer@mailinator.com", "Test User"));
-            //msg.AddTo(new EmailAddress("davemateer@mailinator.com"));
-
-            //var response = await client.SendEmailAsync(msg);
-
-            //if (response.StatusCode != HttpStatusCode.Accepted)
-            //{
-            //    // need retry logic
-            //    ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {response.StatusCode}");
-            //    return Page();
-            //}
-
-            return RedirectToPage("EnquirySent");
         }
 
 
