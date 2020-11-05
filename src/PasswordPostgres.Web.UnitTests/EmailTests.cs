@@ -11,7 +11,7 @@ namespace PasswordPostgres.Web.UnitTests
             //var AppName = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()
             //    .GetSection("AppSettings")["APP_Name"];
 
-            var emailConfiguration = AppConfiguration.LoadFromEnvironment().GetEmailConfiguration();
+            var emailConfiguration = AppConfiguration.LoadConnectionStringFromEnvironment().GetEmailConfiguration();
 
             var message = new EmailMessage
             {
