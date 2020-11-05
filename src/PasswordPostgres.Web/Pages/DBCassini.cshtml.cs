@@ -11,7 +11,7 @@ namespace PasswordPostgres.Web.Pages
 
         public async Task OnGetAsync()
         {
-            var connectionString = AppConfiguration.LoadFromEnvironment().ConnectionString;
+            var connectionString = AppConfiguration.LoadConnectionStringFromEnvironment().ConnectionString;
 
             var things = await Db.GetThings(connectionString);
             Things = things.ToList();

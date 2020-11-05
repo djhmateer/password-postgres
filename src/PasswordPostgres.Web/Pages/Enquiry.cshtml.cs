@@ -46,21 +46,7 @@ namespace PasswordPostgres.Web.Pages
             // Javascript should catch any errors, but just in case
             if (!ModelState.IsValid) return Page();
 
-            var filepath = Directory.GetCurrentDirectory();
-
-            string apiKey;
-            if (filepath == "/var/www/web")
-            {
-                Log.Information("Linux looking for apikey for postmark");
-                apiKey = await System.IO.File.ReadAllTextAsync(filepath + "/secrets/postmark-passwordpostgres.txt");
-            }
-            else
-            {
-                Log.Information("Windows looking for apikey for postmark");
-                apiKey = await System.IO.File.ReadAllTextAsync("../../secrets/postmark-passwordpostgres.txt");
-            }
-
-            var time = DateTime.Now.ToString("HH:mm:ss");
+            var apiKey = AppConfiguration.LoadConnectionStringFromEnvironment().GetPostmarkServerKey();
 
             var message = new PostmarkMessage()
             {
@@ -85,7 +71,6 @@ namespace PasswordPostgres.Web.Pages
             //var imageContent = System.IO.File.ReadAllBytes("test.jpg");
             //message.AddAttachment(imageContent, "test.jpg", "image/jpg", "cid:embed_name.jpg");
 
-            var serverToken = apiKey;
             var client = new PostmarkClient(serverToken);
             try
             {
