@@ -12,7 +12,7 @@ namespace PasswordPostgres.Web.Pages
 
         public async Task OnGetAsync()
         {
-            var connectionString = AppConfiguration.LoadConnectionStringFromEnvironment().ConnectionString;
+            var connectionString = AppConfiguration.LoadFromEnvironment().ConnectionString;
             ConnectionString = connectionString;
 
             var employees = await Db.GetEmployees(connectionString);

@@ -1,38 +1,23 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
+using PostmarkDotNet;
 
 namespace PasswordPostgres.Web
 {
     public static class Email
     {
-        //public static void Send(EmailConfiguration configuration, EmailMessage email)
-        //{
-        //    if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-        //    if (email == null) throw new ArgumentNullException(nameof(email));
-        //    if (string.IsNullOrWhiteSpace(configuration.SmtpServer)) return;
+        public static async Task<PostmarkResponse?> Send(string postmarkServerToken, PostmarkMessage postmarkMessage)
+        {
+            if (string.IsNullOrWhiteSpace(postmarkServerToken)) throw new ArgumentNullException(nameof(postmarkServerToken));
+            if (postmarkMessage == null) throw new ArgumentNullException(nameof(postmarkMessage));
 
-        //    var message = new MailMessage(
-        //        configuration.SmtpUsername,
-        //        email.ToAddress,
-        //        email.Subject,
-        //        email.Body);
+            var client = new PostmarkClient(postmarkServerToken);
+            var sendResult = await client.SendMessageAsync(postmarkMessage);
 
-        //    var client = new SmtpClient(configuration.SmtpServer)
-        //    {
-        //        EnableSsl = configuration.UseSSL,
-        //        Port = configuration.SmtpServerPort,
-        //    };
+            return sendResult;
 
-        //    if (!string.IsNullOrWhiteSpace(configuration.SmtpUsername) &&
-        //        !string.IsNullOrWhiteSpace(configuration.SmtpPassword))
-        //    {
-        //        client.Credentials = new NetworkCredential(
-        //            configuration.SmtpUsername,
-        //            configuration.SmtpPassword);
-        //    }
-
-        //    client.Send(message);
-        //}
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace PasswordPostgres.Web.UnitTests
     public class DbTests : TestsBase
     {
         private readonly string connectionString;
-        public DbTests() => connectionString = AppConfiguration.LoadConnectionStringFromEnvironment().ConnectionString;
+        public DbTests() => connectionString = AppConfiguration.LoadFromEnvironment().ConnectionString;
 
         [Fact]
         public async Task ShouldBeAbleToInsertLogin()

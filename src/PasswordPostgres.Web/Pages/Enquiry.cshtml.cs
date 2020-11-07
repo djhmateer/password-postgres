@@ -1,34 +1,21 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-//using SendGrid;
-//using SendGrid.Helpers.Mail;
-using Serilog;
 using PostmarkDotNet;
-using PostmarkDotNet.Model;
+using Serilog;
 
 namespace PasswordPostgres.Web.Pages
 {
     public class EnquiryModel : PageModel
     {
-        private readonly IEmailService _emailService;
-
-        public EnquiryModel(IEmailService emailService)
-        {
-            _emailService = emailService;
-            Message = "This is a test message"; // a default for testing
-        }
+        public EnquiryModel() => Message = "This is a test message";
 
         [Required]
         [EmailAddress]
         [BindProperty]
-        public string? Email { get; set; }
+        public string? EmailAddress { get; set; }
 
         [Required]
         [BindProperty]
@@ -38,22 +25,17 @@ namespace PasswordPostgres.Web.Pages
         [BindProperty]
         public string? Message { get; set; }
 
-        public void OnGet()
-        {
-        }
+        public void OnGet() { }
+
         public async Task<IActionResult> OnPostAsync()
         {
             // Javascript should catch any errors, but just in case
             if (!ModelState.IsValid) return Page();
 
-            var apiKey = AppConfiguration.LoadConnectionStringFromEnvironment().GetPostmarkServerKey();
 
-            var message = new PostmarkMessage()
+            var postmarkMessage = new PostmarkMessage
             {
-                To = Email,
-                //To = "davemateer@mailinator.com",
-                //To = "pen@hmsoftware.co.uk",
-                //To = "dave@hmsoftware.co.uk",
+                To = EmailAddress,
                 From = "dave@hmsoftware.co.uk", // has to be a Sender Signature on postmark account
                 //TrackOpens = true,
                 Subject = Subject,
@@ -61,21 +43,20 @@ namespace PasswordPostgres.Web.Pages
                 TextBody = Message,
                 //TextBody = "Plain Text Body - hello world",
                 //HtmlBody = "<html><body><img src=\"cid:embed_name.jpg\"/></body></html>",
-                //HtmlBody = "<html><body><p>Hello world</p></body></html>",
+                HtmlBody = "<html><body><p>Hello world</p></body></html>",
                 //Tag = "business-message",
                 //Headers = new HeaderCollection{
                 //    {"X-CUSTOM-HEADER", "Header content"}
                 //}
             };
-
             //var imageContent = System.IO.File.ReadAllBytes("test.jpg");
             //message.AddAttachment(imageContent, "test.jpg", "image/jpg", "cid:embed_name.jpg");
 
-            var client = new PostmarkClient(serverToken);
+            var postmarkServerToken = AppConfiguration.LoadFromEnvironment().PostmarkServerToken;
+
             try
             {
-                var sendResult = await client.SendMessageAsync(message);
-
+                var sendResult = await Email.Send(postmarkServerToken, postmarkMessage);
                 if (sendResult.Status == PostmarkStatus.Success)
                 {
                     Log.Information("send success");

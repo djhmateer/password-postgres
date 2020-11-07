@@ -9,11 +9,17 @@ namespace PasswordPostgres.Web
     public class AppConfiguration
     {
         public string ConnectionString { get; }
+        public string PostmarkServerToken { get; }
 
-        private AppConfiguration(string connectionString) =>
+        private AppConfiguration(
+            string connectionString,
+            string postmarkServerToken)
+        {
             ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            PostmarkServerToken = postmarkServerToken ?? throw new ArgumentNullException(nameof(postmarkServerToken));
+        }
 
-        public static AppConfiguration LoadConnectionStringFromEnvironment()
+        public static AppConfiguration LoadFromEnvironment()
         {
             // This reads the ASPNETCORE_ENVIRONMENT flag from the system
 
@@ -38,50 +44,25 @@ namespace PasswordPostgres.Web
                 default:
                     throw new ArgumentException($"Expected {nameof(aspnetcore)} to be Development, Test or Production and it is {env}");
             }
-            return new AppConfiguration(connectionString);
-        }
 
-        public string GetPostmarkServerKey()
-        {
+
             // need to be more solid with try catch
             var filepath = Directory.GetCurrentDirectory();
 
-            string apiKey;
+            string postmarkServerToken;
             if (filepath == "/var/www/web")
             {
                 Log.Information("Linux looking for apikey for postmark");
-                apiKey = File.ReadAllText(filepath + "/secrets/postmark-passwordpostgres.txt");
+                postmarkServerToken = File.ReadAllText(filepath + "/secrets/postmark-passwordpostgres.txt");
             }
             else
             {
                 Log.Information("Windows looking for apikey for postmark");
-                apiKey = File.ReadAllText("../../secrets/postmark-passwordpostgres.txt");
+                postmarkServerToken = File.ReadAllText("../../secrets/postmark-passwordpostgres.txt");
             }
 
-            return apiKey;
+            return new AppConfiguration(connectionString, postmarkServerToken);
         }
+
     }
-
-    //public class EmailConfiguration
-    //{
-    //    public string SmtpServer { get; }
-    //    public int SmtpServerPort { get; }
-    //    public bool UseSSL { get; }
-    //    public string SmtpUsername { get; }
-    //    public string SmtpPassword { get; }
-
-    //    public EmailConfiguration(
-    //        string smtpServer,
-    //        int smtpServerPort,
-    //        bool useSSL,
-    //        string smtpUsername,
-    //        string smtpPassword)
-    //    {
-    //        SmtpServer = smtpServer ?? throw new ArgumentNullException(nameof(smtpServer));
-    //        SmtpServerPort = smtpServerPort;
-    //        UseSSL = useSSL;
-    //        SmtpUsername = smtpUsername ?? throw new ArgumentNullException(nameof(smtpUsername));
-    //        SmtpPassword = smtpPassword ?? throw new ArgumentNullException(nameof(smtpPassword));
-    //    }
-    //}
 }
