@@ -50,7 +50,9 @@ namespace PasswordPostgres.Web
             var filepath = Directory.GetCurrentDirectory();
 
             string postmarkServerToken;
-            if (filepath == "/var/www/web")
+            // https://postmarkapp.com/support/article/1213-best-practices-for-testing-your-emails-through-postmark
+            if (env == "Test") postmarkServerToken = "POSTMARK_API_TEST";
+            else if (filepath == "/var/www/web")
             {
                 Log.Information("Linux looking for apikey for postmark");
                 postmarkServerToken = File.ReadAllText(filepath + "/secrets/postmark-passwordpostgres.txt");
@@ -63,6 +65,5 @@ namespace PasswordPostgres.Web
 
             return new AppConfiguration(connectionString, postmarkServerToken);
         }
-
     }
 }
