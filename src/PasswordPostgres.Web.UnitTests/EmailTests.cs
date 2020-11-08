@@ -12,7 +12,7 @@ namespace PasswordPostgres.Web.UnitTests
         {
             var postmarkMessage = new PostmarkMessage
             {
-                To = "davemateer@mailinator.com",
+                To = "devtest@hmsoftware.co.uk",
                 From = "dave@hmsoftware.co.uk", // has to be a Sender Signature on postmark account
                 //TrackOpens = true,
                 Subject = "from tests",
@@ -29,6 +29,7 @@ namespace PasswordPostgres.Web.UnitTests
             //var imageContent = System.IO.File.ReadAllBytes("test.jpg");
             //message.AddAttachment(imageContent, "test.jpg", "image/jpg", "cid:embed_name.jpg");
 
+            // this will load a dummy token which would fail if mal-formed email
             var postmarkServerToken = AppConfiguration.LoadFromEnvironment().PostmarkServerToken;
 
             var sendResult = await Email.Send(postmarkServerToken, postmarkMessage);
