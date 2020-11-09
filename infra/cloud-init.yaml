@@ -114,13 +114,6 @@ runcmd:
   - sudo -u postgres psql -d passwordpostgres -a -f insert_data.sql
   - sudo -u postgres psql -d passwordpostgres -a -f import_data.sql
 
-# make a quick test page to signify that the server is ready to go
-  # - cd /var/www/cookie-dave-web
-  # - echo "Healthy" > healthcheck.html
-
-# OS updates need a reboot 
-#  - sudo reboot now
-
   # will use bash templating to insert this secret in
   - echo "Creating secrets directory with api keys in"
   - sudo mkdir /var/www/web/secrets
@@ -134,5 +127,13 @@ runcmd:
   - cd ..
   # so that .NET process can read the file.. todo make less open
   - sudo chmod -R 777 secrets
+
+# make a quick test page to signify that the server is ready to go
+  # - cd /var/www/cookie-dave-web
+  # - echo "Healthy" > healthcheck.html
+
+# OS updates need a reboot 
+  - sudo reboot now
+
 
 final_message: "The system is finally up, after $UPTIME seconds"
