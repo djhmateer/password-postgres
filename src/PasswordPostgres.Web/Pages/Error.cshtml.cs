@@ -15,12 +15,16 @@ namespace PasswordPostgres.Web.Pages
         {
             var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
-            OriginalPath = exceptionHandlerPathFeature.Path;
-            Exception exception = exceptionHandlerPathFeature.Error;
+            // integration tests can call a page where the exceptionHandlerPathFeature can be null
+            if (exceptionHandlerPathFeature != null)
+            {
+                OriginalPath = exceptionHandlerPathFeature.Path;
+                Exception exception = exceptionHandlerPathFeature.Error;
 
-            Message = "Message: " + exceptionHandlerPathFeature.Error.Message;
-            Message += ", InnerException.Message: " + exceptionHandlerPathFeature.Error.InnerException?.Message;
-            Message += ", Type: " + exception.GetType();
+                Message = "Message: " + exceptionHandlerPathFeature.Error.Message;
+                Message += ", InnerException.Message: " + exceptionHandlerPathFeature.Error.InnerException?.Message;
+                Message += ", Type: " + exception.GetType();
+            }
         }
     }
 }
