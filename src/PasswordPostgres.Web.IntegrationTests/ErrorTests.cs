@@ -31,17 +31,28 @@ namespace PasswordPostgres.Web.IntegrationTests
 
             var h1 = content.QuerySelector("h1");
 
+            // my custom 404 page - see startup for the handler
             Assert.Equal("Sorry - 404 Not Found", h1.TextContent);
         }
 
         [Fact]
-        public async Task Get_ErrorShouldReturn500()
+        public async Task Get_ThrowException_ShouldReturn500()
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.GetAsync("/ThrowException");
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Get_ErrorPage_ShouldReturn200_ThisIsJustAPage_ThatOnProd_ErrorsAreRedirectedTo()
         {
             var client = _factory.CreateClient();
 
             var response = await client.GetAsync("/Error");
 
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
     }
 
