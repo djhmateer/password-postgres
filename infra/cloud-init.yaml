@@ -21,15 +21,17 @@
 package_upgrade: true
 runcmd:
   # install dotnet
+  # https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#1804-
   - wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
   - sudo dpkg -i packages-microsoft-prod.deb
-  - sudo add-apt-repository universe -y
+  #- sudo add-apt-repository universe -y
   - sudo apt-get update -y
   - sudo apt-get install apt-transport-https -y
   - sudo apt-get update -y
 
   # need the sdk as we'll be compiling
-  - sudo apt-get install dotnet-sdk-3.1 -y
+  #- sudo apt-get install dotnet-sdk-3.1 -y
+  - sudo apt-get install -y dotnet-sdk-5.0 -y
 
   # nginx
   - sudo apt-get install nginx -y
@@ -63,7 +65,8 @@ runcmd:
 
   # copy files to www directory
   # ***********
-  - cd /home/dave/source/src/PasswordPostgres.Web/bin/Release/netcoreapp3.1/publish/
+  #- cd /home/dave/source/src/PasswordPostgres.Web/bin/Release/netcoreapp3.1/publish/
+  - cd /home/dave/source/src/PasswordPostgres.Web/bin/Release/net5.0/publish/
   - sudo mkdir /var/www/web
   - sudo cp -a * /var/www/web/.
 
@@ -86,10 +89,10 @@ runcmd:
   #
   # Bashtop
   #
-  - echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
-  - sudo wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
-  - sudo apt update -y
-  - sudo apt install bashtop -y
+  #- echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
+  #- sudo wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+  #- sudo apt update -y
+  #- sudo apt install bashtop -y
 
   # Postgres
   - sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
