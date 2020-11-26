@@ -124,22 +124,25 @@ namespace PasswordPostgres.Web.Pages.Account
             await Task.Delay(500);
 
             // get login
-            var login = await Db.LoginByEmail(connectionString, email);
-            if (login == null)
-            {
-                Log.Information($"email address {email} not found in db");
-                return null;
-            }
+            // TODO - put in sample user data and password into the insert scripts
+            // also put in a register page
 
-            // check hash
-            var result = password.HashMatches(login.PasswordHash);
-            if (result == false)
-            {
-                Log.Information($"password hashes don't match for email address {email}");
-                return null;
-            }
+            //var login = await Db.LoginByEmail(connectionString, email);
+            //if (login == null)
+            //{
+            //    Log.Information($"email address {email} not found in db");
+            //    return null;
+            //}
 
-            Log.Information($"Successful password hash match for email {email} ");
+            //// check hash
+            //var result = password.HashMatches(login.PasswordHash);
+            //if (result == false)
+            //{
+            //    Log.Information($"password hashes don't match for email address {email}");
+            //    return null;
+            //}
+
+            //Log.Information($"Successful password hash match for email {email} ");
 
 
             if (email == "tier1@contoso.com")

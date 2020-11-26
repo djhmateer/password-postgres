@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PostmarkDotNet;
-using SendGrid.Helpers.Mail;
 using Xunit;
 
 namespace PasswordPostgres.Web.UnitTests
