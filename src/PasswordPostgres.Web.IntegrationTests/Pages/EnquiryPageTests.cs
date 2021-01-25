@@ -60,7 +60,7 @@ namespace PasswordPostgres.Web.IntegrationTests.Pages
 
             using var content = await HtmlHelpers.GetDocumentAsync(getResponse);
 
-            // get the form (whioh includes the hidden field with the token)
+            // get the form (which includes the hidden field with the token)
             var form = (IHtmlFormElement)content.QuerySelector("form");
 
             if (form["EmailAddress"] is IHtmlInputElement email)
