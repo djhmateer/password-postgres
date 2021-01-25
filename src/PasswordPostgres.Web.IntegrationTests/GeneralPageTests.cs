@@ -17,6 +17,7 @@ namespace PasswordPostgres.Web.IntegrationTests
             _factory = factory;
         }
 
+        // should be only pages that don't need auth
         public static IEnumerable<object[]> ValidUrls => new List<object[]>
         {
             new object[] {"/"},

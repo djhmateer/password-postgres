@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace PasswordPostgres.Web.IntegrationTests
+namespace PasswordPostgres.Web.UnitTests
 {
     public class PasswordTests
     {
