@@ -24,7 +24,7 @@ namespace PasswordPostgres.Web.Pages
             if (feature != null)
             {
 
-                Log.Warning($"Http Status code {statusCode} on {feature.OriginalPath}");
+                //Log.Warning($"Http Status code {statusCode} on {feature.OriginalPath}");
                 CustomStatusCode = statusCode;
                 return;
             }
