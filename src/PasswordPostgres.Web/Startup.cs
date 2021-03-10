@@ -11,15 +11,6 @@ namespace PasswordPostgres.Web
 {
     public class Startup
     {
-        //public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
-        //{
-        //    this.WebHostEnvironment = webHostEnvironment;
-        //    Configuration = configuration;
-        //}
-
-        //public IConfiguration Configuration { get; }
-        //public IWebHostEnvironment WebHostEnvironment { get; }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
@@ -33,7 +24,7 @@ namespace PasswordPostgres.Web
             services.AddSingleton<IEmailService, EmailService>();
 
             // https://stackoverflow.com/questions/32201437/dapper-ambiguous-extension-methods
-            services.AddMiniProfiler(options => options.RouteBasePath = "/profiler");
+            //services.AddMiniProfiler(options => options.RouteBasePath = "/profiler");
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -41,35 +32,25 @@ namespace PasswordPostgres.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
+
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler("/CustomError");
             }
 
-            app.UseMiniProfiler();
+            //app.UseMiniProfiler();
 
-            // https://joonasw.net/view/custom-error-pages
-            app.Use(async (ctx, next) =>
-            {
-                await next();
+            app.UseStaticFiles(); 
 
-                if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
-                {
-                    //Re-execute the request so the user gets the error page
-                    string originalPath = ctx.Request.Path.Value;
-                    ctx.Items["originalPath"] = originalPath;
-                    ctx.Request.Path = "/errors/404";
-                    await next();
-                }
-            });
+            // https://khalidabuhakmeh.com/handle-http-status-codes-with-razor-pages
+            // https://andrewlock.net/retrieving-the-path-that-generated-an-error-with-the-statuscodepages-middleware/
+            app.UseStatusCodePagesWithReExecute("/CustomError", "?statusCode={0}");
 
-            app.UseStaticFiles();
             app.UseRouting();
 
-            // don't want request logging for static files so put it here in the pipeline
-            app.UseSerilogRequestLogging();
+            // don't want request logging for static files so put this serilog middleware here in the pipeline
+            app.UseSerilogRequestLogging(); // <- add this
 
             app.UseAuthentication();
             app.UseAuthorization();

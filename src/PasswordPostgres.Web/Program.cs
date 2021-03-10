@@ -12,9 +12,14 @@ namespace PasswordPostgres.Web
         {
             Log.Logger = new LoggerConfiguration()
                 // `LogEventLevel` requires `using Serilog.Events;`
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                // gets rid of lots of noise
+                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                // if only do warning, then will get duplicate error messages when an exception is thrown, then again when re-executed
+                // we do get 2 error message per single error, but only 1 stack trace
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Fatal)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                // use c:/logs/passwordpostgres/ sometimes if can't control permissions on prod 
                 .WriteTo.File(@"logs/warning.txt", restrictedToMinimumLevel: LogEventLevel.Warning, rollingInterval: RollingInterval.Day)
                 .WriteTo.File(@"logs/info.txt", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Day)
                 //.WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
@@ -37,7 +42,7 @@ namespace PasswordPostgres.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSerilog()
+                .UseSerilog() // <- Add this line
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

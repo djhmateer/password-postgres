@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace PasswordPostgres.Web.Pages
 {
@@ -20,7 +21,6 @@ namespace PasswordPostgres.Web.Pages
         }
     }
 
-   
     public class Employee
     {
         // hacking EF
