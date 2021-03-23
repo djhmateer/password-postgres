@@ -29,6 +29,9 @@ namespace PasswordPostgres.Web
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            app.UseSerilogRequestLogging(); 
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -49,8 +52,6 @@ namespace PasswordPostgres.Web
 
             app.UseRouting();
 
-            // don't want request logging for static files so put this serilog middleware here in the pipeline
-            app.UseSerilogRequestLogging(); // <- add this
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,6 +14,8 @@ namespace PasswordPostgres.Web.Pages
     public class CustomErrorModel : PageModel
     {
         public int? CustomStatusCode { get; set; }
+        public string? RequestId { get; set; }
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
         public void OnGet(int? statusCode = null)
         {
@@ -36,8 +39,12 @@ namespace PasswordPostgres.Web.Pages
             // integration tests can call a page where the exceptionHandlerPathFeature can be null
             CustomStatusCode = 500;
 
+            // can we get some sort of correlationid
+            // maybe - leave in for now.
+            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
             // somewhere else is emitting the Log.Error stacktracke
-            //Log.Error($"Exception is {exceptionHandlerPathFeature.Error}");
+            //Log.Error($"Exception on {exceptionHandlerPathFeature.Path} {exceptionHandlerPathFeature.Error}");
 
             //OriginalPath = exceptionHandlerPathFeature.Path;
             //Exception exception = exceptionHandlerPathFeature.Error;
@@ -46,7 +53,7 @@ namespace PasswordPostgres.Web.Pages
         //public ActionResult OnPost()
         public void OnPost()
         {
-            Log.Warning( "ASP.NET failure - maybe antiforgery. Caught by OnPost Custom Error. Sending a 400 to the user which is probable");
+            Log.Warning("ASP.NET failure - maybe antiforgery. Caught by OnPost Custom Error. Sending a 400 to the user which is probable");
             Log.Warning("Need to take off minimumlevel override in Program.cs for more information");
             CustomStatusCode = 400;
 
