@@ -29,10 +29,6 @@ namespace PasswordPostgres.Web.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // test - some sort of error
-            // what if I press F5 on the following screen?
-            return Page();
-
             // Javascript should catch any errors, but just in case
             if (!ModelState.IsValid) return Page();
 
