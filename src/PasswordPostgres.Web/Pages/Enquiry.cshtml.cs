@@ -29,6 +29,10 @@ namespace PasswordPostgres.Web.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // test - some sort of error
+            // what if I press F5 on the following screen?
+            return Page();
+
             // Javascript should catch any errors, but just in case
             if (!ModelState.IsValid) return Page();
 
@@ -57,13 +61,13 @@ namespace PasswordPostgres.Web.Pages
             try
             {
                 var sendResult = await Email.Send(postmarkServerToken, postmarkMessage);
-                if (sendResult.Status == PostmarkStatus.Success)
+                if (sendResult != null && sendResult.Status == PostmarkStatus.Success)
                 {
                     Log.Information("send success");
                     return RedirectToPage("EnquirySent");
                 }
 
-                Log.Warning($"send fail Postmark {sendResult.Status} {sendResult.Message}");
+                Log.Warning($"send fail Postmark {sendResult?.Status} {sendResult.Message}");
                 ModelState.AddModelError(string.Empty, $"Problem sending email - status code is {sendResult.Status} and message {sendResult.Message}");
                 return Page();
             }
