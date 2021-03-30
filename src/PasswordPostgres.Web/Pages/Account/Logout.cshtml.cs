@@ -15,7 +15,7 @@ namespace PasswordPostgres.Web.Pages.Account
 
         public async Task<IActionResult> OnPost()
         {
-            Log.Information($"User {User.Identity.Name} logged out");
+            Log.Information($"User {User?.Identity?.Name} logged out");
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 

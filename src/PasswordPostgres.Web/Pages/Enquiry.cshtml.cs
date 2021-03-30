@@ -10,7 +10,7 @@ namespace PasswordPostgres.Web.Pages
 {
     public class EnquiryModel : PageModel
     {
-        public EnquiryModel() => Message = "This is a test message";
+        //public EnquiryModel() => Message = "This is a test message";
 
         [Required]
         [EmailAddress]
@@ -25,10 +25,21 @@ namespace PasswordPostgres.Web.Pages
         [BindProperty]
         public string? Message { get; set; }
 
-        public void OnGet() { }
+        public int BudgetAmount { get; set; }
+
+        public void OnGet()
+        {
+            BudgetAmount = 123;
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // fake an error 
+            // the only time I get a form resubmission popup is when
+            // this error page is returned and I hit f5
+            ModelState.AddModelError(string.Empty, "Problem something wrong");
+            return Page();
+
             // Javascript should catch any errors, but just in case
             if (!ModelState.IsValid) return Page();
 

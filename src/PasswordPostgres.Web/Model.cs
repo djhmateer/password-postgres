@@ -2,7 +2,6 @@
 
 namespace PasswordPostgres.Web
 {
-
     public class Login
     {
         public int LoginId { get; set; }
@@ -17,8 +16,6 @@ namespace PasswordPostgres.Web
         //        : new TardisFault(HttpStatusCode.NotFound, "Not Found");
         //}
     }
-
-
 
     public class Model
     {

@@ -15,8 +15,8 @@ namespace PasswordPostgres.Web.Pages.Account
 {
     public class LoginModel : PageModel
     {
-        [BindProperty]
-        public InputModel? Input { get; set; }
+        [BindProperty] 
+        public InputModel Input { get; set; } = null!;
         public string? ReturnUrl { get; set; }
 
         [TempData]
