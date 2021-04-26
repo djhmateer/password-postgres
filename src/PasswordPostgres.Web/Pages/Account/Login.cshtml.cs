@@ -57,10 +57,13 @@ namespace PasswordPostgres.Web.Pages.Account
                 Log.Information("Authenticated!");
                 ViewData["Message"] = "Authenticated so redirect to /Tier1RoleNeeded";
             }
+            else if (User.Identity == null)
+            {
+                ViewData["Message"] = "User.Identity is null - Not Authenticated so please login";
+            }
             else
             {
-                Log.Information("Not Authenticated");
-                ViewData["Message"] = "Not Authenticated so please login";
+                ViewData["Message"] = "User.Identity.IsAuthentication is false - Not Authenticated so please login";
             }
 
             ReturnUrl = returnUrl;
