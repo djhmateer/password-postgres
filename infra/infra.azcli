@@ -159,7 +159,7 @@ az vm create \
     --nics ${nicName} \
     --image ${image} \
     --custom-data cloud-init.yaml \
-    --size Standard_B1s
+    --size Standard_B2s
     #--generate-ssh-keys \
     # above means we will use a generated ssh key from this machine
     # --admin-username ${adminusername} \

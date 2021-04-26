@@ -59,10 +59,16 @@ namespace PasswordPostgres.Web.Pages.Account
             }
             else if (User.Identity == null)
             {
+                //await HttpContext.AuthenticateAsync();
                 ViewData["Message"] = "User.Identity is null - Not Authenticated so please login";
             }
             else
             {
+                Log.Information(" just before AuthenticateAsync");
+                // maybe chrome on a browser has just been opened
+                // force authenticate try
+                await HttpContext.AuthenticateAsync();
+
                 ViewData["Message"] = "User.Identity.IsAuthentication is false - Not Authenticated so please login";
             }
 
