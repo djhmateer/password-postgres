@@ -48,7 +48,19 @@ namespace PasswordPostgres.Web.Pages.Account
             }
 
             // Clear the existing external cookie
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // can we catch if already authenticated?
+            if (User.Identity != null && User.Identity.IsAuthenticated == true)
+            {
+                Log.Information("Authenticated!");
+                ViewData["Message"] = "Authenticated";
+            }
+            else
+            {
+                Log.Information("Not Authenticated");
+                ViewData["Message"] = "Not Authenticated";
+            }
 
             ReturnUrl = returnUrl;
         }
