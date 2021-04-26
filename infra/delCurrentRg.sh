@@ -1,2 +1,2 @@
-az group delete --name PasswordPostgresTEST351 --no-wait --yes 
+az group delete --name PasswordPostgresTEST302 --no-wait --yes 
 
