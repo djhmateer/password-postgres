@@ -29,7 +29,6 @@ namespace PasswordPostgres.Web
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             app.UseSerilogRequestLogging(); 
 
             if (env.IsDevelopment())
@@ -51,7 +50,6 @@ namespace PasswordPostgres.Web
             app.UseStatusCodePagesWithReExecute("/CustomError", "?statusCode={0}");
 
             app.UseRouting();
-
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -41,25 +41,26 @@ namespace PasswordPostgres.Web.Pages.Account
 
         public async Task OnGetAsync(string? returnUrl = null)
         {
-            Log.Information(returnUrl);
-            if (!string.IsNullOrEmpty(ErrorMessage))
-            {
-                ModelState.AddModelError(string.Empty, ErrorMessage);
-            }
+            //Log.Information(returnUrl);
+            //if (!string.IsNullOrEmpty(ErrorMessage))
+            //{
+            //    ModelState.AddModelError(string.Empty, ErrorMessage);
+            //}
 
+            // I want people to be able to come to the login screen and be automatically redirected to /Tier1RoleNeeded
             // Clear the existing external cookie
             //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             // can we catch if already authenticated?
-            if (User.Identity != null && User.Identity.IsAuthenticated == true)
+            if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 Log.Information("Authenticated!");
-                ViewData["Message"] = "Authenticated";
+                ViewData["Message"] = "Authenticated so redirect to /Tier1RoleNeeded";
             }
             else
             {
                 Log.Information("Not Authenticated");
-                ViewData["Message"] = "Not Authenticated";
+                ViewData["Message"] = "Not Authenticated so please login";
             }
 
             ReturnUrl = returnUrl;
