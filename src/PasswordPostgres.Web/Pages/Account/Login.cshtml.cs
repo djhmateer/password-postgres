@@ -55,7 +55,7 @@ namespace PasswordPostgres.Web.Pages.Account
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 Log.Information("Authenticated!");
-                ViewData["Message"] = "Authenticated so redirect to /Tier1RoleNeeded";
+                ViewData["Message"] = "You are signed in already! Authenticated so redirect to /Tier1RoleNeeded";
             }
             else if (User.Identity == null)
             {
