@@ -12,7 +12,7 @@ namespace PasswordPostgres.Web
         {
             Log.Logger = new LoggerConfiguration()
                 // Useful to turn on Information or Debug to get more log information (in the console)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
+                // .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
                 // gets rid of lots of noise
                 // filter out /healthcheck
                 //.Filter.ByExcluding("RequestPath like '/health%'")
@@ -21,7 +21,7 @@ namespace PasswordPostgres.Web
                 // this is good as shows the stack trace in the logs as a ERR
                 // but serilog also logs a separate ERR with the page it came from
                 // would be nice to wrap all up together
-                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
 
                 // this is good as it supresses the ERR stacktrack trace
                 //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Fatal)
