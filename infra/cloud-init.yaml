@@ -95,18 +95,20 @@ runcmd:
   #- sudo apt install bashtop -y
 
   # Postgres
+  # ***THIS INSTALLS 13 now**
   - sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
   - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
   - sudo apt-get update
   - sudo apt-get -y install postgresql
 
-  - sudo systemctl start postgresql@12-main
+  # - sudo systemctl start postgresql@12-main
+  - sudo systemctl start postgresql@13-main
 
   # configure postgres
   # - sudo -u postgres psql -c "CREATE ROLE bob SUPERUSER LOGIN PASSWORD 'letmein3';"
 
-  # create Db, Role of Bob for app to conect to 
-  # -a is to print all the output inclding data to stdout (useful for debugging)
+  # create Db, Role of Bob for app to connect to 
+  # -a is to print all the output including data to stdout (useful for debugging)
   - cd /home/dave/source/infra
   - sudo -u postgres psql -a -f create_db.sql
   - sudo -u postgres psql -a -f create_role.sql
